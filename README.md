@@ -44,18 +44,14 @@ Usage Instructions
 1.  Add the main extension to your dashboard
 
 2.  Navigate to the extension within MainWP and click Cloudflare bridge so you
-    can add your Cloudflare api key  
-    
+    can add your Cloudflare api key
 
-![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Extentions%20Installed.png)
+![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Extentions Installed.png)
 
 1.  head over to Cloudflare and your API settings should look like this to work
     with this extension
 
-  
-
-
-![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Cloudflare%20API%20Token.png)
+![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Cloudflare API Token.png)
 
 1.  Now head back to your screen within the extension to add your API key which
     you'll need to get from Cloudflare in the step above and save
@@ -90,3 +86,54 @@ function cfmwp_format_bandwidth($bytes) {
 
 **Please Note: I have tested this and written this and it works for my custom
 dashboard and requirements you will need to test in your setup**
+
+ 
+
+**As of Version 1.1** -
+
+**Improvement:**
+
+It now updates suffixes information from the public database:
+
+https://publicsuffix.org/list/public_suffix_list.dat this download is now cached
+for 24 hours and should mean its always update with new domain suffix’s
+
+This should permanently fix issue number 1 - [Not working for Country TLDs, I
+have been testing this for a few months now with no issues but obviously do your
+won
+testing!](https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/issues/1)
+
+ 
+
+**New​:**
+
+New filter added to get the data out for use in calculations with the
+mainwp_pro_reports_addition_custom_tokens filter,
+
+ 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$all_analytics = array(
+            'requests'      => $analytics->requests,
+            'uniques'       => $uniq->uniques,
+            'cached'        => $analytics->cachedRequests,
+            'bandwidth'     => $analytics->bytes,
+            'attacks'       => $analytics->threats,
+        );
+        
+         //Use add_filter to register the data for custom hook
+        add_filter('cfmwp_all_analytics_data', function () use ($all_analytics) {
+            return $all_analytics;
+        });
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example Usage:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$all_analytics = apply_filters('cfmwp_all_analytics_data', array());
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$all_analytics['attacks']
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

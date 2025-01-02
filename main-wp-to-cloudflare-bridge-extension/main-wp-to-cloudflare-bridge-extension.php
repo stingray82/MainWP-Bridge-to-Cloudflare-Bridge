@@ -4,13 +4,13 @@
  *
  * @author        Stingray82
  * @license       gplv2
- * @version       1.0.0
+ * @version       1.1
  *
  * @wordpress-plugin
  * Plugin Name:   MainWP Cloudflare Bridge
  * Plugin URI:    https://github.com/stingray82/Cloudflare-MainWP-Bridge
  * Description:   Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
- * Version:       1.0.0
+ * Version:       1.1
  * Author:        Stingray82
  * Author URI:    https://github.com/stingray82
  * Text Domain:   cloudflare-to-mainwp-bridge-extension
@@ -173,32 +173,54 @@ $cloudflareMainWPBridgeActivator = Cloudflare_MainWP_Bridge_Activator::getInstan
 // Hook for generating custom tokens
 add_filter('mainwp_pro_reports_custom_tokens', 'cfmwp_generate_custom_analytics_tokens', 10, 4);
 
-// Function to extract the root domain
+// Function to extract the root domain // This is now dynamic and linked to the dat file // Updates set to every 24 hours
 function get_root_domain($domain) {
+    $list_url = 'https://publicsuffix.org/list/public_suffix_list.dat';
+    $cache_dir = WP_CONTENT_DIR . '/uploads/cache';
+    if (!file_exists($cache_dir)) {
+        mkdir($cache_dir, 0755, true); // Create cache directory if it doesn't exist
+    }
+    $cache_file = $cache_dir . '/public_suffix_list.dat'; // Change this to your cache location
+
+    // Check if the cache file exists or is outdated
+    if (!file_exists($cache_file) || time() - filemtime($cache_file) > 86400) { // Refresh every 24 hours
+        $list_content = @file_get_contents($list_url);
+        if ($list_content !== false) {
+            file_put_contents($cache_file, $list_content);
+        } else {
+            throw new Exception("Failed to download the Public Suffix List.");
+        }
+    }
+
+    // Load the cached suffix list
+    $public_suffixes = file($cache_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+    $valid_suffixes = [];
+    foreach ($public_suffixes as $line) {
+        $line = trim($line);
+        if (strpos($line, '//') === 0) {
+            continue; // Skip comments
+        }
+        $valid_suffixes[$line] = true;
+    }
+
     $parts = explode('.', $domain);
     $num_parts = count($parts);
 
-    // Handle cases like 'childsite.wptv.uk' and 'www.example.co.uk'
-    if ($num_parts > 2) {
-        $tld = $parts[$num_parts - 1]; // Top-level domain (e.g., 'uk')
-        $sld = $parts[$num_parts - 2]; // Second-level domain (e.g., 'co', 'org')
-
-        // Common SLDs like co.uk, org.uk, etc.
-        $common_slds = array('co', 'org', 'gov', 'ac');
-
-        if (in_array($sld, $common_slds)) {
-            // If the domain is 'example.co.uk', return 'example.co.uk'
-            $root_domain = $parts[$num_parts - 3] . '.' . $sld . '.' . $tld;
-        } else {
-            // Otherwise, return 'example.com' or 'example.uk'
-            $root_domain = $sld . '.' . $tld;
+    // Start with the most specific suffix and work backward
+    for ($i = 1; $i < $num_parts; $i++) {
+        $potential_suffix = implode('.', array_slice($parts, $i));
+        if (isset($valid_suffixes[$potential_suffix])) {
+            // Match found; determine the root domain
+            $root_domain = implode('.', array_slice($parts, $i - 1));
+            return $root_domain;
         }
-    } else {
-        $root_domain = $domain;
     }
 
-    return $root_domain;
+    return $domain;
 }
+
+
 
 function cfmwp_generate_custom_analytics_tokens($tokensValues, $report, $site, $templ_email) {
     $api_token = get_option('cfmwp_api_token');
@@ -273,6 +295,24 @@ function cfmwp_generate_custom_analytics_tokens($tokensValues, $report, $site, $
         $tokensValues['[cfmwp-cached]'] = $analytics->cachedRequests;
         $tokensValues['[cfmwp-bandwidth]'] = cfmwp_format_bandwidth($analytics->bytes); // Use the new formatting function here
         $tokensValues['[cfmwp-attacks]'] = $analytics->threats;
+
+        
+        // Pass all analytics data via a filter
+        $all_analytics = array(
+            'requests'      => $analytics->requests,
+            'uniques'       => $uniq->uniques,
+            'cached'        => $analytics->cachedRequests,
+            'bandwidth'     => $analytics->bytes,
+            'attacks'       => $analytics->threats,
+        );
+        
+         //Use add_filter to register the data for custom hook
+        add_filter('cfmwp_all_analytics_data', function () use ($all_analytics) {
+            return $all_analytics;
+        });
+        
+        //error_log('From Plugin- CFMWP Analytics Data: ' . print_r($all_analytics, true));
+        
     }
 
     return $tokensValues;
