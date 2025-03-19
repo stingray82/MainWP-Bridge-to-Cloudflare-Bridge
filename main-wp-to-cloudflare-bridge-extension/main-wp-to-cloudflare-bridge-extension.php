@@ -1,23 +1,19 @@
 <?php
 /**
- * MainWP Cloudflare Bridge Extension
- *
- * @author        Stingray82
- * @license       gplv2
- * @version       1.1
- *
- * @wordpress-plugin
- * Plugin Name:   MainWP Cloudflare Bridge
- * Plugin URI:    https://github.com/stingray82/Cloudflare-MainWP-Bridge
- * Description:   Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
- * Version:       1.1
- * Author:        Stingray82
- * Author URI:    https://github.com/stingray82
- * Text Domain:   cloudflare-to-mainwp-bridge-extension
- * Domain Path:   /languages
- * License:       GPLv2
- * License URI:   https://www.gnu.org/licenses/gpl-2.0.html
- */
+ * Plugin Name:       MainWP Cloudflare Bridge
+ * Tested up to:      6.7.2
+ * Description:       Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
+ * Requires at least: 6.5
+ * Requires PHP:      7.4
+ * Version:           1.1
+ * Author:            Stingray82
+ * Author URI:        https://github.com/stingray82
+ * License:           GPLv2
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       cloudflare-to-mainwp-bridge-extension
+ * Website:           https://reallyusefulplugins.com
+ * */
+
 
 // Exit if accessed directly.
 if (!defined('ABSPATH')) exit;
