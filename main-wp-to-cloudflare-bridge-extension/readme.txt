@@ -4,7 +4,7 @@ Donate link: https://reallyusefulplugins.com/donate
 Tags: MainWP, Cloudflare, Pro-report
 Requires at least: 6.5
 Tested up to: 6.8.1
-Stable tag: 1.1.5
+Stable tag: 1.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -24,3 +24,5 @@ Install on your dashboard and it will allow you to pull data from Cloudflare for
  
 == Changelog == 
 1.2 - V1.2 - Added automatic updates using GitHub to the plugin (Experimental)
+Over the next week or so this will slowly increase to V1.3 as I test a new deploy script and updater for GitHub repos.
+
