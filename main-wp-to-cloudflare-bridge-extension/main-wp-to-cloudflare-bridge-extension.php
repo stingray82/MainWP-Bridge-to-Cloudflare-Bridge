@@ -339,7 +339,7 @@ add_action( 'plugins_loaded', function() {
         'name'        => 'MainWP Cloudflare Bridge',         // human‐readable plugin name
         'version'     => RUP_MAINWP_CLF_BRIDGE_VERSION, // same as the VERSION constant above
         'key'         => '',                 // your secret key for private updater
-        'server'      => 'https://updater.reallyusefulplugins.com/u/',
+        'server'      => 'https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/',
     ];
 
     // 3) Call the helper in the UUPD\V1 namespace:
