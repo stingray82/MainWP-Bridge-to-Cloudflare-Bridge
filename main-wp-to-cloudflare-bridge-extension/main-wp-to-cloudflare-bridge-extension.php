@@ -1,19 +1,18 @@
 <?php
 /**
  * Plugin Name:       MainWP Cloudflare Bridge
- * Tested up to:      6.7.2
  * Description:       Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
+ * Tested up to:      6.8.1
  * Requires at least: 6.5
  * Requires PHP:      7.4
- * Version:           1.1
+ * Version:           1.1.1
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       cloudflare-to-mainwp-bridge-extension
  * Website:           https://reallyusefulplugins.com
- * */
-
+ */
 
 // Exit if accessed directly.
 if (!defined('ABSPATH')) exit;
@@ -321,3 +320,28 @@ function cfmwp_format_bandwidth($bytes) {
     $value = $bytes / pow(1024, $power);
     return round($value, 2) . ' ' . $units[$power];
 }
+
+// Define plugin constants
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.1.1');
+
+// ──────────────────────────────────────────────────────────────────────────
+//  Updater bootstrap (plugins_loaded priority 1):
+// ──────────────────────────────────────────────────────────────────────────
+add_action( 'plugins_loaded', function() {
+    // 1) Load our universal drop-in. Because that file begins with "namespace UUPD\V1;",
+    //    both the class and the helper live under UUPD\V1.
+    require_once __DIR__ . '/includes/updater.php';
+
+    // 2) Build a single $updater_config array:
+    $updater_config = [
+        'plugin_file' => plugin_basename( __FILE__ ),             // e.g. "simply-static-export-notify/simply-static-export-notify.php"
+        'slug'        => 'cloudflare-to-mainwp-bridge-extension',           // must match your updater‐server slug
+        'name'        => 'MainWP Cloudflare Bridge',         // human‐readable plugin name
+        'version'     => RUP_MAINWP_CLF_BRIDGE_VERSION, // same as the VERSION constant above
+        'key'         => '',                 // your secret key for private updater
+        'server'      => 'https://updater.reallyusefulplugins.com/u/',
+    ];
+
+    // 3) Call the helper in the UUPD\V1 namespace:
+    \UUPD\V1\UUPD_Updater_V1::register( $updater_config );
+}, 1 );

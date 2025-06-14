@@ -1,0 +1,12 @@
+Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
+== Description ==
+
+Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
+
+== Installation ==
+
+1. Upload the `cloudflare-to-mainwp-bridge-extension` folder to the `/wp-content/plugins/` directory.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Configure the plugin settings it is located in the Simply Static Menu
+
+== Frequently Asked Questions ==
