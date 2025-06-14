@@ -330,7 +330,7 @@ define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.1.1');
 add_action( 'plugins_loaded', function() {
     // 1) Load our universal drop-in. Because that file begins with "namespace UUPD\V1;",
     //    both the class and the helper live under UUPD\V1.
-    require_once __DIR__ . '/includes/updater.php';
+    require_once __DIR__ . '/inc/updater.php';
 
     // 2) Build a single $updater_config array:
     $updater_config = [
