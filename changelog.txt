@@ -1,0 +1,1 @@
+1.2 - V1.2 - Added automatic updates using GitHub to the plugin (Experimental)
