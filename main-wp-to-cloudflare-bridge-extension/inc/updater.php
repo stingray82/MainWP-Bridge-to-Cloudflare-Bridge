@@ -93,7 +93,7 @@
  * What This Does:
  *  - Detects updates from GitHub or private JSON endpoints
  *  - Auto-selects GitHub logic if `server` contains "github.com"
- *  - Caches metadata in `upd_{slug}` for 1 hour
+ *  - Caches metadata in `upd_{slug}` for 6 hour
  *  - Injects WordPress update data via native transients
  *  - Adds “View details” + “Check for updates” under plugin/theme row
  *  - Works seamlessly with `wp_update_plugins()` or `wp_update_themes()`
@@ -207,7 +207,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
 
                 if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
                     $release = json_decode( wp_remote_retrieve_body( $response ) );
-                    set_transient( $cache_key, $release, 3 * HOUR_IN_SECONDS );
+                    set_transient( $cache_key, $release, 6 * HOUR_IN_SECONDS );
                 } else {
                     $this->log( '✗ GitHub API failed or error returned' );
                     $release = null;
@@ -239,7 +239,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
                 ];
             }
 
-            set_transient( 'upd_' . $c['slug'], $meta, 3 * HOUR_IN_SECONDS );
+            set_transient( 'upd_' . $c['slug'], $meta, 6 * HOUR_IN_SECONDS );
         } else {
             $this->fetch_remote();
             $meta = get_transient( 'upd_' . $c['slug'] );
@@ -313,7 +313,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
 
                     if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
                         $release = json_decode( wp_remote_retrieve_body( $response ) );
-                        set_transient( $cache_key, $release, 3 * HOUR_IN_SECONDS );
+                        set_transient( $cache_key, $release, 6 * HOUR_IN_SECONDS );
                     } else {
                         $release = null;
                     }
@@ -335,7 +335,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
                     ];
                 }
 
-                set_transient( 'upd_' . $slug, $meta, 3 * HOUR_IN_SECONDS );
+                set_transient( 'upd_' . $slug, $meta, 6 * HOUR_IN_SECONDS );
             } else {
                 $this->fetch_remote();
                 $meta = get_transient( 'upd_' . $slug );
