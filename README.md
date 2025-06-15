@@ -46,12 +46,12 @@ Usage Instructions
 2.  Navigate to the extension within MainWP and click Cloudflare bridge so you
     can add your Cloudflare api key
 
-![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Extentions Installed.png)
+![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Extentions%20Installed.png)
 
 1.  head over to Cloudflare and your API settings should look like this to work
     with this extension
 
-![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Cloudflare API Token.png)
+![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Cloudflare%20API%20Token.png)
 
 1.  Now head back to your screen within the extension to add your API key which
     you'll need to get from Cloudflare in the step above and save
@@ -135,5 +135,4 @@ $all_analytics = apply_filters('cfmwp_all_analytics_data', array());
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $all_analytics['attacks']
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
