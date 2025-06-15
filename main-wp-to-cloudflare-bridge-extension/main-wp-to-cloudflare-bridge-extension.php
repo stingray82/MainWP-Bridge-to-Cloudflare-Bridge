@@ -4,8 +4,8 @@
  * Description:       Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
  * Tested up to:      6.8.1
  * Requires at least: 6.5
- * Requires PHP:      7.4
- * Version:           1.2.4.3
+ * Requires PHP:      8.0
+ * Version:           1.2.4.4
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -322,7 +322,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.2.4.3');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.2.4.4');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
