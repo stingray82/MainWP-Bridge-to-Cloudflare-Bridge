@@ -46,12 +46,12 @@ Usage Instructions
 2.  Navigate to the extension within MainWP and click Cloudflare bridge so you
     can add your Cloudflare api key
 
-![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Extentions%20Installed.png)
+![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Extentions Installed.png)
 
 1.  head over to Cloudflare and your API settings should look like this to work
     with this extension
 
-![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Cloudflare%20API%20Token.png)
+![](https://github.com/stingray82/repo-images/raw/main/mainwp-cloudflare-bridge/Cloudflare API Token.png)
 
 1.  Now head back to your screen within the extension to add your API key which
     you'll need to get from Cloudflare in the step above and save
@@ -136,3 +136,21 @@ $all_analytics = apply_filters('cfmwp_all_analytics_data', array());
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $all_analytics['attacks']
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  
+
+
+**As of Version 1.2**
+
+Automatic Updates are now being tested over the course of a week or so from the
+14th June 2025 there will be several no update updates to this repo to test this
+automatic updater both directly through the git-hub api and a man in the middle
+proxy with caching
+
+You can read more about the gateway here [GitHub Update
+Gateway](https://techarticles.co.uk/github-update-caching-gateway/)
+
+ 
+
+Version 1.3 will be the stable automatic updater version and will signal testing
+has completed on automatic updates
