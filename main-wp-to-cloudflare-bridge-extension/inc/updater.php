@@ -11,6 +11,26 @@
  *
  * Safe to include multiple times. Class is namespaced and encapsulated.
  *
+ * ╭───────────────────────────── GitHub Token Filters ─────────────────────────────╮
+ *
+ * ➤ Override GitHub tokens globally or per plugin slug:
+ *
+ *   // A. Apply a single fallback token for all GitHub plugins:
+ *   add_filter( 'uupd/github_token_override', function( $token, $slug ) {
+ *       return 'ghp_yourGlobalFallbackToken';
+ *   }, 10, 2 );
+ *
+ *   // B. Apply per-slug tokens only when needed:
+ *   add_filter( 'uupd/github_token_override', function( $token, $slug ) {
+ *       $tokens = [
+ *           'plugin-slug-1' => 'ghp_tokenForPlugin1',
+ *           'plugin-slug-2' => 'ghp_tokenForPlugin2',
+ *       ];
+ *       return $tokens[ $slug ] ?? $token;
+ *   }, 10, 2 );
+ *
+ * ╰────────────────────────────────────────────────────────────────────────────────╯
+ *
  * ╭──────────────────────────── Plugin Integration ─────────────────────────────╮
  *
  * 1. Save this file to: `includes/updater.php` inside your plugin.
@@ -68,8 +88,8 @@
  *
  *     Also enable in wp-config.php:
  *         define( 'WP_DEBUG', true );
- *         define( 'WP_DEBUG_LOG', true );
- *
+ *         define( 'WP_DEBUG_LOG', true ); * 
+ * 
  * What This Does:
  *  - Detects updates from GitHub or private JSON endpoints
  *  - Auto-selects GitHub logic if `server` contains "github.com"
@@ -84,6 +104,8 @@ namespace UUPD\V1;
 if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
 
     class UUPD_Updater_V1 {
+
+        const VERSION = '1.2.1'; // Change as needed
 
         /** @var array Configuration settings */
         private $config;
@@ -102,6 +124,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
          */
         public function __construct( array $config ) {
             $this->config = $config;
+            $this->log( "✓ Using UUPD_Updater_V1 version " . self::VERSION );
             $this->register_hooks();
         }
 
@@ -177,17 +200,28 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
                 $release = get_transient( $cache_key );
 
                 if ( false === $release ) {
-                    $api_url = str_replace( 'github.com', 'api.github.com/repos', $repo_url ) . '/releases/latest';
-                    $headers = [ 'Accept' => 'application/vnd.github.v3+json' ];
-                    if ( ! empty( $c['github_token'] ) ) {
-                        $headers['Authorization'] = 'token ' . $c['github_token'];
-                    }
+                $api_url = str_replace( 'github.com', 'api.github.com/repos', $repo_url ) . '/releases/latest';
 
-                    $response = wp_remote_get( $api_url, [ 'headers' => $headers ] );
-                    if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
-                        $release = json_decode( wp_remote_retrieve_body( $response ) );
-                        set_transient( $cache_key, $release, HOUR_IN_SECONDS );
-                    }
+                // Allow user to override token via filter
+                $supplied_token = apply_filters( 'uupd/github_token_override', $c['github_token'] ?? '', $c['slug'] );
+
+                $headers = [ 'Accept' => 'application/vnd.github.v3+json' ];
+                if ( ! empty( $supplied_token ) ) {
+                    $headers['Authorization'] = 'token ' . $supplied_token;
+                }
+
+                $this->log( "→ Fetching GitHub release for {$repo_url}" );
+
+                $response = wp_remote_get( $api_url, [ 'headers' => $headers ] );
+                if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                    $release = json_decode( wp_remote_retrieve_body( $response ) );
+                    set_transient( $cache_key, $release, HOUR_IN_SECONDS );
+                    $this->log( "GitHub release cached for {$repo_url}" );
+                } else {
+                    $this->log( "GitHub API fetch failed for {$repo_url}" );
+                }
+                } else {
+                    $this->log( "GitHub release cache hit for {$repo_url}" );
                 }
 
                 if ( isset( $release->tag_name ) ) {
