@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-REM V1.1
+REM V1.2
 REM ─────────────────────────────────────────────────────
 REM CONFIGURATION
 REM ─────────────────────────────────────────────────────
@@ -18,18 +18,40 @@ SET "DEST_DIR="
 SET "DEPLOY_TARGET=github"  REM github or private
 
 REM GitHub settings
-SET "GITHUB_REPO=stingray82/MainWP-Bridge-to-Cloudflare-Bridge"
+
+REM GitHub username (your personal or organization GitHub account)
+SET "GITHUB_USER=stingray82"
+
+REM Name of the GitHub repository (case-sensitive; must match exactly)
+SET "REPO_NAME=MainWP-Bridge-to-Cloudflare-Bridge"
+
+REM Slug used to name the downloadable asset and ZIP file (usually matches plugin folder name)
+SET "ASSET_SLUG=MainWP-Bridge-to-Cloudflare-Bridge"
+
+REM Full GitHub repository path (user/repo) used in API calls — built from above values
+SET "GITHUB_REPO=%GITHUB_USER%/%REPO_NAME%"
+
+REM Name of the output ZIP file used for GitHub release asset
+SET "ZIP_NAME=%ASSET_SLUG%.zip"
+
+REM Path to your GitHub personal access token (used for authenticated API requests)
 SET "TOKEN_FILE=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\github_token.txt"
+
+REM Load token from file into GITHUB_TOKEN variable
 SET /P GITHUB_TOKEN=<"%TOKEN_FILE%"
-SET "ZIP_NAME=main-wp-to-cloudflare-bridge-extension.zip"
 
 REM ─────────────────────────────────────────────────────
-REM STATIC JSON UPDATE CONFIG
+REM STATIC JSON UPDATE CONFIG (for plugin update checker)
 REM ─────────────────────────────────────────────────────
+
+REM Path to the local repo for hosting index.json and readme.txt (used for update server)
 SET "STATIC_REPO_DIR=C:\Users\Nathan\Git\example-static-update\MainWP-Bridge-to-Cloudflare-Bridge\"
+
+REM PHP script that generates index.json for the update checker (this script is reused)
 SET "GENERATE_INDEX_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\generate_index.php"
+
+REM Public URL where index.json and ZIP are hosted (used by the plugin updater)
 SET "STATIC_DOMAIN=https://updates.rupwp.uk"
-SET "GITHUB_USER=stingray82"
 
 REM ─────────────────────────────────────────────────────
 REM VERIFY REQUIRED FILES
@@ -131,7 +153,10 @@ php "%GENERATE_INDEX_SCRIPT%" ^
     "%CHANGELOG_FILE%" ^
     "%PLUGIN_STATIC_PATH%" ^
     "%GITHUB_USER%" ^
-    "%STATIC_DOMAIN%"
+    "%STATIC_DOMAIN%" ^
+    "%ASSET_SLUG%" ^
+    "%REPO_NAME%"
+
 
 echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
 
