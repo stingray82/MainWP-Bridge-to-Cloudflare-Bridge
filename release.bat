@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-
+REM V1.1
 REM ─────────────────────────────────────────────────────
 REM CONFIGURATION
 REM ─────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ SET "ZIP_NAME=main-wp-to-cloudflare-bridge-extension.zip"
 REM ─────────────────────────────────────────────────────
 REM STATIC JSON UPDATE CONFIG
 REM ─────────────────────────────────────────────────────
-SET "STATIC_REPO_DIR=C:\Users\Nathan\Git\example-static-update\main-wp-to-cloudflare-bridge-extension\"
+SET "STATIC_REPO_DIR=C:\Users\Nathan\Git\example-static-update\MainWP-Bridge-to-Cloudflare-Bridge\"
 SET "GENERATE_INDEX_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\generate_index.php"
 SET "STATIC_DOMAIN=https://updates.rupwp.uk"
 SET "GITHUB_USER=stingray82"
