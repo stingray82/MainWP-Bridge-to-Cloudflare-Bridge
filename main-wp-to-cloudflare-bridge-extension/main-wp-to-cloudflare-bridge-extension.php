@@ -340,7 +340,8 @@ add_action( 'plugins_loaded', function() {
         'version'     => RUP_MAINWP_CLF_BRIDGE_VERSION, // same as the VERSION constant above
         'key'         => '',                 // your secret key for private updater
         //'server'      => 'https://updater.reallyusefulplugins.com/gh/',
-        'server'      => 'https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge',        
+        //'server'      => 'https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge',        
+        'server'      => 'https://updates.rupwp.uk/main-wp-to-cloudflare-bridge-extension/index.json',
     ];
 
     // 3) Call the helper in the UUPD\V1 namespace:
