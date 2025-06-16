@@ -26,13 +26,10 @@ SET "ZIP_NAME=main-wp-to-cloudflare-bridge-extension.zip"
 REM ─────────────────────────────────────────────────────
 REM STATIC JSON UPDATE CONFIG
 REM ─────────────────────────────────────────────────────
-SET "STATIC_REPO_DIR=C:\Path\To\Your\Static-Site-Repo"
+SET "STATIC_REPO_DIR=C:\Users\Nathan\Git\example-static-update\main-wp-to-cloudflare-bridge-extension\"
 SET "GENERATE_INDEX_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\generate_index.php"
-SET "STATIC_DOMAIN=https://uupd.uk"
+SET "STATIC_DOMAIN=https://updates.rupwp.uk"
 SET "GITHUB_USER=stingray82"
-
-
-
 
 REM ─────────────────────────────────────────────────────
 REM VERIFY REQUIRED FILES
@@ -102,30 +99,28 @@ IF %ERRORLEVEL% EQU 1 (
 )
 popd
 
-
-
 REM ─────────────────────────────────────────────────────
 REM ZIP PLUGIN FOLDER
 REM ─────────────────────────────────────────────────────
 SET "SEVENZIP=C:\Program Files\7-Zip\7z.exe"
 for %%a in ("%PLUGIN_DIR%") do (
-  set "PARENT_DIR=%%~dpa"
-  set "FOLDER_NAME=%%~nxa"
+    set "PARENT_DIR=%%~dpa"
+    set "FOLDER_NAME=%%~nxa"
 )
 SET "ZIP_FILE=%PARENT_DIR%%ZIP_NAME%"
 
 pushd "%PARENT_DIR%"
 "%SEVENZIP%" a -tzip "%ZIP_FILE%" "%FOLDER_NAME%"
 popd
-echo ✅ Zipped to: %ZIP_FILE%
+echo Zipped to: %ZIP_FILE%
 
 REM ─────────────────────────────────────────────────────
-REM GENERATE STATIC index.json AND PUSH TO STATIC REPO
+REM GENERATE STATIC index.json AND COMMIT TO STATIC REPO
 REM ─────────────────────────────────────────────────────
-echo 📝 Generating static index.json...
+echo Generating static index.json...
 
 SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
-SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%\%PLUGIN_FOLDER_NAME%"
+SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR:~0,-1%"
 
 IF NOT EXIST "%PLUGIN_STATIC_PATH%" (
     mkdir "%PLUGIN_STATIC_PATH%"
@@ -138,25 +133,19 @@ php "%GENERATE_INDEX_SCRIPT%" ^
     "%GITHUB_USER%" ^
     "%STATIC_DOMAIN%"
 
-echo ✅ Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
+echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
 
-REM ─────────────────────────────────────────────────────
-REM COMMIT TO STATIC SITE REPO
-REM ─────────────────────────────────────────────────────
 pushd "%STATIC_REPO_DIR%"
-git add "%PLUGIN_FOLDER_NAME%\index.json"
-
+git add -A
 git diff --cached --quiet
 IF %ERRORLEVEL% EQU 1 (
-    git commit -m "🔁 Static update for %PLUGIN_FOLDER_NAME% v%version%"
+    git commit -m "%FOLDER_NAME% version %version%"
     git push origin main
-    echo 🚀 Static metadata pushed to repo.
+    echo Static repo committed and pushed.
 ) ELSE (
-    echo ⚠️ No changes to push in static repo.
+    echo No changes to commit in static repo.
 )
 popd
-
-
 
 REM ─────────────────────────────────────────────────────
 REM DEPLOY LOGIC
@@ -166,93 +155,149 @@ IF /I "%DEPLOY_TARGET%"=="private" (
     copy "%ZIP_FILE%" "%DEST_DIR%"
     echo ✅ Copied to %DEST_DIR%
 ) ELSE IF /I "%DEPLOY_TARGET%"=="github" (
-    echo 🚀 Deploying to GitHub...
+    CALL :deploy_github
+)
 
+goto :done
+
+:done
+echo.
+echo 🔚 Done. Press any key to exit...
+pause >nul
+exit
+
+
+
+
+:deploy_github
+echo 🚀 Deploying to GitHub...
+
+setlocal enabledelayedexpansion
+set "RELEASE_TAG=v%version%"
+set "RELEASE_NAME=%version%"
+set "BODY_FILE=%TEMP%\changelog_body.json"
+set "CHANGELOG_BODY="
+
+echo Creating body file...
+
+for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
+    set "line=%%l"
+    REM Escape backslashes and quotes, then wrap each line in quotes and append \n manually.
+    set "line=!line:\=\\!"
+    set "line=!line:"=\"!"
+    set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\\n"
+
+)
+REM No need to trim, it's a plain string now.
+
+REM Write JSON manually to BODY_FILE using echo per line
+> "!BODY_FILE!" echo {
+>> "!BODY_FILE!" echo   "tag_name": "!RELEASE_TAG!",
+>> "!BODY_FILE!" echo   "name": "!RELEASE_NAME!",
+>> "!BODY_FILE!" echo   "body": "!CHANGELOG_BODY!",
+>> "!BODY_FILE!" echo   "draft": false,
+>> "!BODY_FILE!" echo   "prerelease": false
+>> "!BODY_FILE!" echo }
+
+
+
+echo -------- BEGIN JSON BODY --------
+type "!BODY_FILE!"
+echo -------- END JSON BODY ----------
+
+curl -s -w "%%{http_code}" -o "%TEMP%\github_release_response.json" ^
+    -H "Authorization: token %GITHUB_TOKEN%" ^
+    -H "Accept: application/vnd.github+json" ^
+    https://api.github.com/repos/%GITHUB_REPO%/releases/tags/!RELEASE_TAG! > "%TEMP%\github_http_status.txt"
+
+set /p HTTP_STATUS=<"%TEMP%\github_http_status.txt"
+set "RELEASE_ID="
+
+if "!HTTP_STATUS!"=="200" (
+    for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
+        if not defined RELEASE_ID set "RELEASE_ID=%%i"
+    )
+    set "RELEASE_ID=!RELEASE_ID: =!"
+    set "RELEASE_ID=!RELEASE_ID:,=!"
+    echo 📝 Release already exists. Updating body...
+
+    curl -s -X PATCH "https://api.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!" ^
+        -H "Authorization: token %GITHUB_TOKEN%" ^
+        -H "Accept: application/vnd.github+json" ^
+        -H "Content-Type: application/json" ^
+        --data-binary "@!BODY_FILE!"
+) else (
+    echo 🆕 Creating new release...
+
+    curl -s -X POST "https://api.github.com/repos/%GITHUB_REPO%/releases" ^
+        -H "Authorization: token %GITHUB_TOKEN%" ^
+        -H "Accept: application/vnd.github+json" ^
+        -H "Content-Type: application/json" ^
+        --data-binary "@!BODY_FILE!" > "%TEMP%\github_release_response.json"
+
+    for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
+        if not defined RELEASE_ID set "RELEASE_ID=%%i"
+    )
+    set "RELEASE_ID=!RELEASE_ID: =!"
+    set "RELEASE_ID=!RELEASE_ID:,=!"
+)
+
+IF NOT DEFINED RELEASE_ID (
+    echo ❌ Could not determine release ID.
+    type "%TEMP%\github_release_response.json"
+    endlocal
+    exit /b
+)
+
+setlocal enabledelayedexpansion
+set "ASSET_ID="
+set "MATCHING_ASSET=0"
+
+for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
+    set "LINE=%%L"
     setlocal enabledelayedexpansion
-    set "RELEASE_TAG=v%version%"
-    set "RELEASE_NAME=%version%"
-    set "BODY_FILE=%TEMP%\changelog_body.json"
-    set "CHANGELOG_BODY="
 
-    echo Creating body file...
-
-    for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
-        set "line=%%l"
-        set "line=!line:"=\\\"!"
-        set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\n"
+    REM --- Look for the matching ZIP file name
+    echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
+    if !errorlevel! == 0 (
+        set "MATCHING_ASSET=1"
     )
-    set "CHANGELOG_BODY=!CHANGELOG_BODY:~0,-2!"
 
-    (
-        echo {
-        echo   "tag_name": "!RELEASE_TAG!",
-        echo   "name": "!RELEASE_NAME!",
-        echo   "body": "!CHANGELOG_BODY!",
-        echo   "draft": false,
-        echo   "prerelease": false
-        echo }
-    ) > "!BODY_FILE!"
-
-    echo -------- BEGIN JSON BODY --------
-    type "!BODY_FILE!"
-    echo -------- END JSON BODY ----------
-
-    REM Try to get existing release by tag
-    curl -s -w "%%{http_code}" -o "%TEMP%\github_release_response.json" ^
-        -H "Authorization: token %GITHUB_TOKEN%" ^
-        -H "Accept: application/vnd.github+json" ^
-        https://api.github.com/repos/%GITHUB_REPO%/releases/tags/!RELEASE_TAG! > "%TEMP%\github_http_status.txt"
-
-    set /p HTTP_STATUS=<"%TEMP%\github_http_status.txt"
-
-    set "RELEASE_ID="
-
-    if "!HTTP_STATUS!"=="200" (
-        for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
-            if not defined RELEASE_ID set "RELEASE_ID=%%i"
+    REM --- When found, start looking backward for the `id` key
+    if !MATCHING_ASSET! == 1 (
+        echo !LINE! | findstr /C:"\"id\":" >nul
+        if !errorlevel! == 0 (
+            for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
+                endlocal
+                set "ASSET_ID=%%B"
+                set "ASSET_ID=%ASSET_ID:,=%"
+                set "ASSET_ID=%ASSET_ID: =%"
+                goto :found_asset
+            )
         )
-        set "RELEASE_ID=!RELEASE_ID: =!"
-        set "RELEASE_ID=!RELEASE_ID:,=!"
-        echo 📝 Release already exists. Updating body...
-
-        curl -s -X PATCH "https://api.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!" ^
-            -H "Authorization: token %GITHUB_TOKEN%" ^
-            -H "Accept: application/vnd.github+json" ^
-            -H "Content-Type: application/json" ^
-            --data-binary "@!BODY_FILE!"
-    ) else (
-        echo 🆕 Creating new release...
-
-        curl -s -X POST "https://api.github.com/repos/%GITHUB_REPO%/releases" ^
-            -H "Authorization: token %GITHUB_TOKEN%" ^
-            -H "Accept: application/vnd.github+json" ^
-            -H "Content-Type: application/json" ^
-            --data-binary "@!BODY_FILE!" > "%TEMP%\github_release_response.json"
-
-        for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
-            if not defined RELEASE_ID set "RELEASE_ID=%%i"
-        )
-        set "RELEASE_ID=!RELEASE_ID: =!"
-        set "RELEASE_ID=!RELEASE_ID:,=!"
     )
-
-    IF NOT DEFINED RELEASE_ID (
-        echo ❌ Could not determine release ID.
-        type "%TEMP%\github_release_response.json"
-        exit /b
-    )
-
-    echo ✅ Using Release ID: !RELEASE_ID!
-
-    curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
-        -H "Authorization: token %GITHUB_TOKEN%" ^
-        -H "Accept: application/vnd.github+json" ^
-        -H "Content-Type: application/zip" ^
-        --data-binary "@%ZIP_FILE%"
 
     endlocal
 )
+:found_asset
+endlocal & set "ASSET_ID=%ASSET_ID%"
 
-echo.
-echo ✅ Deployment complete → %DEPLOY_TARGET%
-pause
+
+if defined ASSET_ID (
+    echo Deleting existing asset ID: %ASSET_ID%...
+    curl -X DELETE -H "Authorization: token %GITHUB_TOKEN%" ^
+         https://api.github.com/repos/%GITHUB_REPO%/releases/assets/%ASSET_ID%
+) else (
+    echo ⚠️ No matching asset found to delete.
+)
+
+echo 📤 Uploading new ZIP...
+curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
+    -H "Authorization: token %GITHUB_TOKEN%" ^
+    -H "Accept: application/vnd.github+json" ^
+    -H "Content-Type: application/zip" ^
+    --data-binary "@%ZIP_FILE%"
+
+echo ✅ Deployment complete → github
+endlocal
+goto :done
