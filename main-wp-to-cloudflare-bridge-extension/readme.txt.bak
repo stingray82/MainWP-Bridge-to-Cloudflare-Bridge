@@ -4,7 +4,7 @@ Donate link: https://reallyusefulplugins.com/donate
 Tags: MainWP, Cloudflare, Pro-report
 Requires at least: 6.5
 Tested up to: 6.8.1
-Stable tag: 1.2.4.19
+Stable tag: 1.2.4.20
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
