@@ -105,7 +105,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
 
     class UUPD_Updater_V1 {
 
-        const VERSION = '1.2.2'; // Change as needed
+        const VERSION = '1.2.3'; // Change as needed
 
         /** @var array Configuration settings */
         private $config;
@@ -147,8 +147,10 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
             $slug = rawurlencode( $c['slug'] );
             $key  = rawurlencode( $c['key'] );
             $host = rawurlencode( wp_parse_url( untrailingslashit( home_url() ), PHP_URL_HOST ) );
-            $url  = untrailingslashit( $c['server'] )
-                  . "/?action=get_metadata&slug={$slug}&key={$key}&domain={$host}";
+            $separator = strpos( $c['server'], '?' ) === false ? '?' : '&';
+            $url  = rtrim( $c['server'], '/' ) 
+                  . $separator . "action=get_metadata&slug={$slug}&key={$key}&domain={$host}";
+
 
             $this->log( "→ Fetching metadata: {$url}" );
             $resp = wp_remote_get( $url, [
@@ -366,7 +368,47 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
         unset( $trans->no_update[ $slug ] );
         return $trans;
     }
+        /** Provide plugin information for the details popup. */
+        public function plugin_info( $res, $action, $args ) {
+            $c = $this->config;
+            if ( 'plugin_information' !== $action || $args->slug !== $c['slug'] ) {
+                return $res;
+            }
 
+            $meta = get_transient( 'upd_' . $c['slug'] );
+            if ( ! $meta ) {
+                return $res;
+            }
+
+            // Build sections array (description, installation, faq, screenshots, changelog…)
+            $sections = [];
+            if ( isset( $meta->sections ) ) {
+                foreach ( (array) $meta->sections as $key => $content ) {
+                    $sections[ $key ] = $content;
+                }
+            }
+
+            return (object) [
+                'name'            => $c['name'],
+                'title'           => $c['name'],               // Popup title
+                'slug'            => $c['slug'],
+                'version'         => $meta->version        ?? '',
+                'author'          => $meta->author         ?? '',
+                'author_homepage' => $meta->author_homepage ?? '',
+                'requires'        => $meta->requires       ?? $meta->min_wp_version ?? '',
+                'tested'          => $meta->tested         ?? '',
+                'requires_php'    => $meta->requires_php   ?? '',   // “Requires PHP: x.x or higher”
+                'last_updated'    => $meta->last_updated   ?? '',
+                'download_link'   => $meta->download_url   ?? '',
+                'homepage'        => $meta->homepage       ?? '',
+                'sections'        => $sections,
+                'icons'           => isset( $meta->icons )   ? (array) $meta->icons   : [],
+                'banners'         => isset( $meta->banners ) ? (array) $meta->banners : [],
+                'screenshots'     => isset( $meta->screenshots ) 
+                                       ? (array) $meta->screenshots 
+                                       : [],
+            ];
+        }
         
 
         /** Provide theme information for the details popup. */
