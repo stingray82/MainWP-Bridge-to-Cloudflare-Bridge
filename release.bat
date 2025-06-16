@@ -43,6 +43,8 @@ SET /P GITHUB_TOKEN=<"%TOKEN_FILE%"
 REM ─────────────────────────────────────────────────────
 REM STATIC JSON UPDATE CONFIG (for plugin update checker)
 REM ─────────────────────────────────────────────────────
+REM Set to false to remove
+SET "SKIP_STATIC_INDEX=true" 
 
 REM Path to the local repo for hosting index.json and readme.txt (used for update server)
 SET "STATIC_REPO_DIR=C:\Users\Nathan\Git\example-static-update\MainWP-Bridge-to-Cloudflare-Bridge\"
@@ -139,38 +141,40 @@ echo Zipped to: %ZIP_FILE%
 REM ─────────────────────────────────────────────────────
 REM GENERATE STATIC index.json AND COMMIT TO STATIC REPO
 REM ─────────────────────────────────────────────────────
-echo Generating static index.json...
+IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
 
-SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
-SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR:~0,-1%"
+    echo Generating static index.json...
 
-IF NOT EXIST "%PLUGIN_STATIC_PATH%" (
-    mkdir "%PLUGIN_STATIC_PATH%"
+    SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
+    SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR:~0,-1%"
+
+    IF NOT EXIST "%PLUGIN_STATIC_PATH%" (
+        mkdir "%PLUGIN_STATIC_PATH%"
+    )
+
+    php "%GENERATE_INDEX_SCRIPT%" ^
+        "%PLUGIN_FILE%" ^
+        "%CHANGELOG_FILE%" ^
+        "%PLUGIN_STATIC_PATH%" ^
+        "%GITHUB_USER%" ^
+        "%STATIC_DOMAIN%" ^
+        "%ASSET_SLUG%" ^
+        "%REPO_NAME%"
+
+    echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
+
+    pushd "%STATIC_REPO_DIR%"
+    git add -A
+    git diff --cached --quiet
+    IF %ERRORLEVEL% EQU 1 (
+        git commit -m "%FOLDER_NAME% version %version%"
+        git push origin main
+        echo Static repo committed and pushed.
+    ) ELSE (
+        echo No changes to commit in static repo.
+    )
+    popd
 )
-
-php "%GENERATE_INDEX_SCRIPT%" ^
-    "%PLUGIN_FILE%" ^
-    "%CHANGELOG_FILE%" ^
-    "%PLUGIN_STATIC_PATH%" ^
-    "%GITHUB_USER%" ^
-    "%STATIC_DOMAIN%" ^
-    "%ASSET_SLUG%" ^
-    "%REPO_NAME%"
-
-
-echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
-
-pushd "%STATIC_REPO_DIR%"
-git add -A
-git diff --cached --quiet
-IF %ERRORLEVEL% EQU 1 (
-    git commit -m "%FOLDER_NAME% version %version%"
-    git push origin main
-    echo Static repo committed and pushed.
-) ELSE (
-    echo No changes to commit in static repo.
-)
-popd
 
 REM ─────────────────────────────────────────────────────
 REM DEPLOY LOGIC
