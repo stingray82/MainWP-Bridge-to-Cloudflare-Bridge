@@ -26,7 +26,7 @@ REM Name of the GitHub repository (case-sensitive; must match exactly)
 SET "REPO_NAME=MainWP-Bridge-to-Cloudflare-Bridge"
 
 REM Slug used to name the downloadable asset and ZIP file (usually matches plugin folder name)
-SET "ASSET_SLUG=main-wp-to-cloudflare-bridge-extension"
+SET "ASSET_SLUG=MainWP-Bridge-to-Cloudflare-Bridge"
 
 REM Full GitHub repository path (user/repo) used in API calls — built from above values
 SET "GITHUB_REPO=%GITHUB_USER%/%REPO_NAME%"
