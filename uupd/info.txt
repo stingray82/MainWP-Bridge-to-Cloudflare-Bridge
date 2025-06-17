@@ -1,0 +1,5 @@
+This plugin's update metadata is available at:
+
+https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/index.json
+
+Use this URL as the 'server' parameter when configuring the updater.

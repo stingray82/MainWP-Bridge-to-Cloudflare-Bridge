@@ -1,0 +1,21 @@
+{
+    "slug": "MainWP-Bridge-to-Cloudflare-Bridge",
+    "version": "1.2.4.23",
+    "tested": "6.8.1",
+    "min_wp_version": "6.5",
+    "min_php_version": "8.0",
+    "homepage": "https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/",
+    "download_url": "https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/releases/latest/download/MainWP-Bridge-to-Cloudflare-Bridge.zip",
+    "icons": {
+        "1x": "https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/icon-128.png",
+        "2x": "https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/icon-256.png"
+    },
+    "banners": {
+        "low": "https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/banner-772x250.png",
+        "high": "https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/banner-1544x500.png"
+    },
+    "sections": {
+        "changelog": "<li>1.2 - V1.2 - Added automatic updates using GitHub to the plugin (Experimental)</li><li>Over the next week or so this will slowly increase to V1.3 as I test a new deploy script and updater for GitHub repos.</li>"
+    },
+    "last_updated": "2025-06-17 16:54:38"
+}
