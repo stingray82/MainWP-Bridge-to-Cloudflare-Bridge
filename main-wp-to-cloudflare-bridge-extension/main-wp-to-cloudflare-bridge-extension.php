@@ -5,7 +5,7 @@
  * Tested up to:      6.8.1
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.2.4.24
+ * Version:           1.2.4.25
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -322,7 +322,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.2.4.24');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.2.4.25');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
@@ -339,7 +339,7 @@ add_action( 'plugins_loaded', function() {
         'name'        => 'MainWP Cloudflare Bridge',         // human‐readable plugin name
         'version'     => RUP_MAINWP_CLF_BRIDGE_VERSION, // same as the VERSION constant above
         'key'         => '',                 // your secret key for private updater
-        'server'      => 'https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge',
+        'server'      => 'https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/index.json',
     ];
 
     // 3) Call the helper in the UUPD\V1 namespace:
