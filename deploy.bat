@@ -83,7 +83,7 @@ php "%GENERATOR_SCRIPT%" ^
     "%GITHUB_USER%" ^
     "%CDN_PATH%" ^
     "%REPO_NAME%" ^
-    "%REPO_NAME%"
+    "%ZIP_NAME%"
 
 IF EXIST "%STATIC_SUBFOLDER%\index.json" (
     echo ✅ index.json generated → %STATIC_SUBFOLDER%\index.json
