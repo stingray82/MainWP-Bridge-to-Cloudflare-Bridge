@@ -145,7 +145,7 @@ if ( ! class_exists( __NAMESPACE__ . '\Updater_V1' ) ) {
         private function fetch_remote() {
             $c    = $this->config;
             $slug = rawurlencode( $c['slug'] );
-            $key  = rawurlencode( $c['key'] );
+            $key  = rawurlencode( $c['key'] ?? '' );
             $host = rawurlencode( wp_parse_url( untrailingslashit( home_url() ), PHP_URL_HOST ) );
             $separator = strpos( $c['server'], '?' ) === false ? '?' : '&';
             $url = ( str_ends_with( $c['server'], '.json' ) ? $c['server'] : untrailingslashit( $c['server'] ) )
