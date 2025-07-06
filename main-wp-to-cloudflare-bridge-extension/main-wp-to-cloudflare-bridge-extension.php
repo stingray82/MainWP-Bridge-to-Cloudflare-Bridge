@@ -5,7 +5,7 @@
  * Tested up to:      6.8.1
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.3
+ * Version:           1.3.1
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -322,7 +322,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.1');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
@@ -343,5 +343,5 @@ add_action( 'plugins_loaded', function() {
     ];
 
     // 3) Call the helper in the UUPD\V1 namespace:
-    \UUPD\V1\UUPD_Updater_V1::register( $updater_config );
+    \RUP\Updater\Updater_V1::register( $updater_config );
 }, 1 );
