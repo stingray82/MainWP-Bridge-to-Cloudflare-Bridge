@@ -23,6 +23,8 @@ Install on your dashboard and it will allow you to pull data from Cloudflare for
 == Frequently Asked Questions ==
  
 == Changelog == 
+1.3.1 -  Scoped UUPD to be unique to my plugins to prevent issues with older versions
+1.3 Stable Release of Updater
 1.2 - V1.2 - Added automatic updates using GitHub to the plugin (Experimental)
 Over the next week or so this will slowly increase to V1.3 as I test a new deploy script and updater for GitHub repos.
 
