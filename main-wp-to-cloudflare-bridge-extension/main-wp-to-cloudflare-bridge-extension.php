@@ -2,10 +2,10 @@
 /**
  * Plugin Name:       MainWP Cloudflare Bridge
  * Description:       Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
- * Tested up to:      6.8.1
+ * Tested up to:      6.8.2
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.3.2
+ * Version:           1.3.3
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -322,7 +322,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.2');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.3');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
