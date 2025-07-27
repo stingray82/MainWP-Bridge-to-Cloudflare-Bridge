@@ -5,7 +5,7 @@
  * Tested up to:      6.8.2
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.3.3
+ * Version:           1.3.4-alpha
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -40,6 +40,8 @@ class Cloudflare_MainWP_Bridge_Extension {
     public function admin_init() {
         // Register settings
         register_setting('cloudflare_mainwp_bridge_options_group', 'cfmwp_api_token');
+        register_setting('cloudflare_mainwp_bridge_options_group', 'cloudflare-to-mainwp-bridge-extension_allow_prerelease');
+
     }
 
     public function enqueue_admin_styles() {
@@ -60,27 +62,41 @@ class Cloudflare_MainWP_Bridge_Extension {
     }
 
     public static function renderPage() {
-        ?>
-        <div class="ui segment">
-            <div class="inside">
-                <form method="post" action="options.php">
-                    <?php
-                    settings_fields('cloudflare_mainwp_bridge_options_group');
-                    do_settings_sections('cloudflare_mainwp_bridge_options_group');
-                    ?>
-                    <h3><?php _e('Cloudflare API Settings', 'cloudflare-to-mainwp-bridge-extension'); ?></h3>
-                    <table class="form-table">
-                        <tr valign="top">
-                            <th scope="row"><?php _e('API Token', 'cloudflare-to-mainwp-bridge-extension'); ?></th>
-                            <td><input type="text" name="cfmwp_api_token" value="<?php echo esc_attr(get_option('cfmwp_api_token')); ?>" /></td>
-                        </tr>
-                    </table>
-                    <?php submit_button(); ?>
-                </form>
-            </div>
+    ?>
+    <div class="ui segment">
+        <div class="inside">
+            <form method="post" action="options.php">
+                <?php
+                settings_fields('cloudflare_mainwp_bridge_options_group');
+                ?>
+                <h3><?php _e('Cloudflare API Settings', 'cloudflare-to-mainwp-bridge-extension'); ?></h3>
+                <table class="form-table">
+                    <tr valign="top">
+                        <th scope="row"><?php _e('API Token', 'cloudflare-to-mainwp-bridge-extension'); ?></th>
+                        <td><input type="text" name="cfmwp_api_token" value="<?php echo esc_attr(get_option('cfmwp_api_token')); ?>" /></td>
+                    </tr>
+                </table>
+
+                <h3><?php _e('Update Preferences', 'cloudflare-to-mainwp-bridge-extension'); ?></h3>
+                <table class="form-table">
+                    <tr valign="top">
+                        <th scope="row"><?php _e('Enable Pre-Releases', 'cloudflare-to-mainwp-bridge-extension'); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="cloudflare-to-mainwp-bridge-extension_allow_prerelease" value="yes" <?php checked(get_option('cloudflare-to-mainwp-bridge-extension_allow_prerelease'), 'yes'); ?> />
+                                <?php _e('Allow updates from pre-release versions', 'cloudflare-to-mainwp-bridge-extension'); ?>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+
+                <?php submit_button(); ?>
+            </form>
         </div>
-        <?php
-    }
+    </div>
+    <?php
+}
+
 }
 
 class Cloudflare_MainWP_Bridge_Activator {
@@ -322,7 +338,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.3');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.4-alpha');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
@@ -344,4 +360,8 @@ add_action( 'plugins_loaded', function() {
 
     // 3) Call the helper in the UUPD\V1 namespace:
     \RUP\Updater\Updater_V1::register( $updater_config );
-}, 1 );
+}, 20 );
+
+add_filter('uupd/allow_prerelease/cloudflare-to-mainwp-bridge-extension', function ($allow) {
+    return get_option('cloudflare-to-mainwp-bridge-extension_allow_prerelease') === 'yes';
+}, 5);
