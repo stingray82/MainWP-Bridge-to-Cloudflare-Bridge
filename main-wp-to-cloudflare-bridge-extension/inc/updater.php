@@ -276,6 +276,19 @@ if ( ! class_exists( __NAMESPACE__ . '\Updater_V1' ) ) {
         }
 
 
+        private function normalize_version( $v ) {
+            // Treat 'alpha', 'beta', 'rc' as 'alpha.0', etc.
+            return preg_replace_callback(
+                '/^(\d+\.\d+\.\d+)-(alpha|beta|rc|dev|preview)$/i',
+                function( $m ) {
+                    return "{$m[1]}-{$m[2]}.0";
+                },
+                $v
+            );
+        }
+
+
+
         /** Handle plugin update injection. */
         public function plugin_update( $trans ) {
             if ( ! is_object( $trans ) || ! isset( $trans->checked ) || ! is_array( $trans->checked ) ) {
@@ -371,28 +384,42 @@ if ( ! class_exists( __NAMESPACE__ . '\Updater_V1' ) ) {
             $allow_prerelease   = $this->config['allow_prerelease'] ?? false;
 
             // If prerelease is not allowed and the version is a prerelease, skip
-            if (
-                ! $meta
-                || ( ! $allow_prerelease && preg_match( '/\d+\.\d+\.\d+-(alpha|beta|rc)[\.\d\-]*/i', $remote_version ) )
-                || version_compare( $current, $remote_version, '>=' )
-            ) {
-                $this->log( "Plugin '{$slug}' is up to date (v$current)" );
-                $trans->no_update[ $file ] = (object) [
-                    'id'           => $file,
-                    'slug'         => $slug,
-                    'plugin'       => $file,
-                    'new_version'  => $current,
-                    'url'          => $meta->homepage ?? '',
-                    'package'      => '',
-                    'icons'        => (array) ( $meta->icons ?? [] ),
-                    'banners'      => (array) ( $meta->banners ?? [] ),
-                    'tested'       => $meta->tested ?? '',
-                    'requires'     => $meta->requires ?? $meta->min_wp_version ?? '',
-                    'requires_php' => $meta->requires_php ?? '',
-                    'compatibility'=> new \stdClass(),
-                ];
-                return $trans;
-            }
+            $current_normalized = $this->normalize_version( $current );
+            $remote_normalized  = $this->normalize_version( $remote_version );
+            $this->log( "Comparing normalized versions: installed={$current_normalized}, remote={$remote_normalized}" );
+
+
+            if ( ! $meta ) {
+                            $this->log("No metadata found, skipping update logic.");
+                            return $trans;
+                        }
+
+                        // Extra logging for clarity
+                        $this->log( "Original versions: installed={$current}, remote={$remote_version}" );
+                        $this->log( "Normalized versions: installed={$current_normalized}, remote={$remote_normalized}" );
+
+                        if (
+                            ( ! $allow_prerelease && preg_match( '/\d+\.\d+\.\d+-(alpha|beta|rc|dev|preview)[\.\d\-]*/i', $remote_version ) )
+                            || version_compare( $current_normalized, $remote_normalized, '>=' )
+                        ) {
+                            $this->log( "Plugin '{$slug}' is up to date (v{$current})" );
+                            $trans->no_update[ $file ] = (object) [
+                                'id'           => $file,
+                                'slug'         => $slug,
+                                'plugin'       => $file,
+                                'new_version'  => $current,
+                                'url'          => $meta->homepage ?? '',
+                                'package'      => '',
+                                'icons'        => (array) ( $meta->icons ?? [] ),
+                                'banners'      => (array) ( $meta->banners ?? [] ),
+                                'tested'       => $meta->tested ?? '',
+                                'requires'     => $meta->requires ?? $meta->min_wp_version ?? '',
+                                'requires_php' => $meta->requires_php ?? '',
+                                'compatibility'=> new \stdClass(),
+                            ];
+                            return $trans;
+                        }
+
 
             //  Inject update data
             $this->log( "Injecting plugin update '{$slug}' → v{$meta->version}" );
@@ -508,12 +535,22 @@ if ( ! class_exists( __NAMESPACE__ . '\Updater_V1' ) ) {
         $remote_version     = $meta->version ?? '0.0.0';
         $allow_prerelease   = $this->config['allow_prerelease'] ?? false;
 
-        // If prerelease is not allowed and the version is a prerelease, skip
+        if ( ! $meta ) {
+            $this->log("No metadata found, skipping update logic.");
+            return $trans;
+        }
+
+        $current_normalized = $this->normalize_version( $current );
+        $remote_normalized  = $this->normalize_version( $remote_version );
+
+        $this->log( "Original versions: installed={$current}, remote={$remote_version}" );
+        $this->log( "Normalized versions: installed={$current_normalized}, remote={$remote_normalized}" );
+
         if (
-            ! $meta
-            || ( ! $allow_prerelease && preg_match( '/\d+\.\d+\.\d+-(alpha|beta|rc)[\.\d\-]*/i', $remote_version ) )
-            || version_compare( $current, $remote_version, '>=' )
+            ( ! $allow_prerelease && preg_match( '/\d+\.\d+\.\d+-(alpha|beta|rc|dev|preview)[\.\d\-]*/i', $remote_version ) )
+            || version_compare( $current_normalized, $remote_normalized, '>=' )
         ) {
+
             $this->log( " Theme '{$c['slug']}' is up to date (v$current)" );
             $trans->no_update[ $slug ] = (object) array_merge( $base_info, [
                 'new_version' => $current,

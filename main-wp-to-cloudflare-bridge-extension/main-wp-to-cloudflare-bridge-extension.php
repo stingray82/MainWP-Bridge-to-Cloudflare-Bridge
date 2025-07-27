@@ -5,7 +5,7 @@
  * Tested up to:      6.8.2
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.3.4-alpha.1
+ * Version:           1.3.4-alpha.2
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -338,7 +338,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.4-alpha.1');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.4-alpha.2');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
@@ -365,4 +365,3 @@ add_action( 'plugins_loaded', function() {
 add_filter('uupd/allow_prerelease/mainwp-bridge-to-cloudflare-bridge', function ($allow) {
     return get_option('cloudflare-to-mainwp-bridge-extension_allow_prerelease') === 'yes';
 }, 5);
-
