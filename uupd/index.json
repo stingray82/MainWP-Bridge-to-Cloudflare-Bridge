@@ -1,7 +1,7 @@
 {
     "slug": "MainWP-Bridge-to-Cloudflare-Bridge",
     "name": "MainWP Cloudflare Bridge",
-    "version": "1.3.4-alpha.3",
+    "version": "1.3.4-alpha.4",
     "author": "Stingray82",
     "author_homepage": "https://github.com/stingray82",
     "requires_php": "8.0",
@@ -13,7 +13,7 @@
         "frequently_asked_questions": "",
         "changelog": "<li>1.3.4 - New: Added Support for Preleases, New: Updated UUPD to 1.3.0</li><li>1.3.3 - Minor Improvements</li><li>1.3.2 - Updated UUPD to 1.2.5</li><li>1.3.1 -  Scoped UUPD to be unique to my plugins to prevent issues with older versions</li><li>1.3 Stable Release of Updater</li><li>1.2 - V1.2 - Added automatic updates using GitHub to the plugin (Experimental)</li><li>Over the next week or so this will slowly increase to V1.3 as I test a new deploy script and updater for GitHub repos.</li>"
     },
-    "last_updated": "2025-07-27 16:04:33",
+    "last_updated": "2025-07-27 16:21:40",
     "download_url": "https://github.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/releases/latest/download/main-wp-to-cloudflare-bridge-extension.zip",
     "banners": {
         "low": "https://raw.githubusercontent.com/stingray82/MainWP-Bridge-to-Cloudflare-Bridge/main/uupd/banner-772x250.png",
