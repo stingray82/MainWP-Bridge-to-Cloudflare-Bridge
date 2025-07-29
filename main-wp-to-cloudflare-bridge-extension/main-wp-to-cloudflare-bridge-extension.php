@@ -46,7 +46,7 @@ class Cloudflare_MainWP_Bridge_Extension {
 
     public function enqueue_admin_styles() {
         // Enqueue the style
-        wp_enqueue_style('cfmwp_Load_CSS', plugin_dir_url(__FILE__) . 'css/style.css');
+        //wp_enqueue_style('cfmwp_Load_CSS', plugin_dir_url(__FILE__) . 'css/style.css');
     }
 
     public function managesites_subpage($subPage) {
