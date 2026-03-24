@@ -2,10 +2,10 @@
 /**
  * Plugin Name:       MainWP Cloudflare Bridge
  * Description:       Install on your dashboard and it will allow you to pull data from Cloudflare for your MainWP reports.
- * Tested up to:      6.8.2
+ * Tested up to:      6.9.4
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.3.5
+ * Version:           1.3.6
  * Author:            Stingray82
  * Author URI:        https://github.com/stingray82
  * License:           GPLv2
@@ -338,7 +338,7 @@ function cfmwp_format_bandwidth($bytes) {
 }
 
 // Define plugin constants
-define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.5');
+define('RUP_MAINWP_CLF_BRIDGE_VERSION', '1.3.6');
 
 // ──────────────────────────────────────────────────────────────────────────
 //  Updater bootstrap (plugins_loaded priority 1):
@@ -350,6 +350,7 @@ add_action( 'plugins_loaded', function() {
 
     // 2) Build a single $updater_config array:
     $updater_config = [
+    	'vendor'	  => 'RUP',
         'plugin_file' => plugin_basename( __FILE__ ),             // e.g. "simply-static-export-notify/simply-static-export-notify.php"
         'slug'        => 'mainwp-bridge-to-cloudflare-bridge',           // must match your updater‐server slug
         'name'        => 'MainWP Cloudflare Bridge',         // human‐readable plugin name
@@ -359,7 +360,7 @@ add_action( 'plugins_loaded', function() {
     ];
 
     // 3) Call the helper in the UUPD\V1 namespace:
-    \RUP\Updater\Updater_V1::register( $updater_config );
+    \RUP\Updater\Updater_V2::register( $updater_config );
 }, 20 );
 
 add_filter('uupd/allow_prerelease/mainwp-bridge-to-cloudflare-bridge', function ($allow) {
