@@ -363,9 +363,15 @@ add_action( 'plugins_loaded', function() {
     \RUP\Updater\Updater_V2::register( $updater_config );
 }, 20 );
 
-add_filter('uupd/allow_prerelease', function ($allow, $vendor, $slug) {
-    if ($vendor === 'rup' && $slug === 'mainwp-bridge-to-cloudflare-bridge') {
-        return get_option('cloudflare-to-mainwp-bridge-extension_allow_prerelease') === 'yes';
-    }
-    return $allow;
-}, 5, 3);
+add_filter(
+    'uupd/allow_prerelease/rup/mainwp-bridge-to-cloudflare-bridge',
+    function ( $allow, $vendor, $slug, $instance_key ) {
+
+        $option = get_option( 'cloudflare-to-mainwp-bridge-extension_allow_prerelease', 'no' );
+
+        return $option === 'yes';
+
+    },
+    10,
+    4
+);
