@@ -3,8 +3,8 @@ Contributors: reallyusefulplugins
 Donate link: https://reallyusefulplugins.com/donate
 Tags: MainWP, Cloudflare, Pro-report
 Requires at least: 6.5
-Tested up to: 6.9.4
-Stable tag: 1.3.6
+Tested up to: 7.0.2
+Stable tag: 1.3.7
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -23,6 +23,7 @@ Install on your dashboard and it will allow you to pull data from Cloudflare for
 == Frequently Asked Questions ==
 
 == Changelog ==
+1.3.7 Updated: UUPD Dependency Updated to Version 2.0 Stable
 1.3.6 - Update: Updater to 2.0-Alpha Update: Compatibility
 1.3.5 - Fix Stylesheet 404 error
 1.3.4 - New: Added Support for Preleases, New: Updated UUPD to 1.3.0
